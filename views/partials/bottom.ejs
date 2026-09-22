@@ -1,0 +1,38 @@
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="foot-logo" href="<%= url('home') %>"><img src="/img/logo.png" alt="LuggagePark" width="124" height="34" loading="lazy"></a>
+        <p><%= t('footer.tagline') %></p>
+        <p><a href="https://wa.me/<%= settings.whatsapp %>" rel="noopener">WhatsApp <%= settings.phone %></a><br><a href="mailto:<%= settings.email %>"><%= settings.email %></a></p>
+      </div>
+      <div><h2><%= t('footer.places') %></h2><ul>
+        <% (typeof footerLocations !== 'undefined' ? footerLocations : []).forEach(function(l){ %><li><a href="<%= url('locations', l.slug) %>"><%= f(l,'name') %></a></li><% }) %>
+      </ul></div>
+      <div><h2><%= t('footer.help') %></h2><ul>
+        <li><a href="<%= url('book') %>"><%= t('nav.book') %></a></li>
+        <li><a href="<%= url('track') %>"><%= t('nav.track') %></a></li>
+        <li><a href="<%= url('pricing') %>"><%= t('nav.pricing') %></a></li>
+        <li><a href="<%= url('faq') %>"><%= t('nav.faq') %></a></li>
+        <li><a href="<%= url('contact') %>"><%= t('nav.contact') %></a></li>
+      </ul></div>
+      <div><h2><%= t('footer.company') %></h2><ul>
+        <li><a href="<%= url('about') %>"><%= t('footer.about') %></a></li>
+        <li><a href="<%= url('business') %>"><%= t('nav.business') %></a></li>
+        <li><a href="<%= url('privacy') %>"><%= t('footer.privacy') %></a></li>
+        <li><a href="<%= url('terms') %>"><%= t('footer.terms') %></a></li>
+        <li><a href="<%= alt[other] %>" lang="<%= other %>" hreflang="<%= other %>"><%= t('nav.lang_switch') %></a></li>
+      </ul></div>
+    </div>
+    <div class="foot-bottom"><span>© <%= new Date().getFullYear() %> LuggagePark. <%= t('footer.rights') %></span><span>Drop. Store. Travel more.</span></div>
+  </div>
+</footer>
+<% if (pageKey !== 'book' && pageKey !== 'track') { %>
+<div class="mbar no-print">
+  <div class="from"><%= t('mobilebar.from') %><b><%= money(fromPrice) %></b><%= t('mobilebar.per_bag') %></div>
+  <a class="btn btn-primary" href="<%= url('book') %>"><%= t('nav.book') %></a>
+</div><% } %>
+<script src="/js/site.js?v=<%= assetV %>" defer></script>
+</body>
+</html>

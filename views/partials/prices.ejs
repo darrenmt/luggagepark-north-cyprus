@@ -1,0 +1,12 @@
+<div class="prices">
+  <% tariffs.forEach(function(x){ %>
+  <article class="price<%= x.featured ? ' feat' : '' %>">
+    <% if (x.featured) { %><span class="flag"><%= t('pricing.popular') %></span><% } %>
+    <h3><%= f(x,'name') %></h3>
+    <p class="muted small" style="margin:0"><%= f(x,'desc') %></p>
+    <div class="amt"><%= money(x.price) %></div>
+    <div class="unit"><%= f(x,'unit') %></div>
+    <ul><% f(x,'features').split('\n').filter(Boolean).forEach(function(li){ %><li><%= li %></li><% }) %></ul>
+    <a class="btn <%= x.featured ? 'btn-primary' : 'btn-line' %>" href="<%= url('book') %>?plan=<%= x.code %>"><%= t('pricing.choose') %>: <%= f(x,'name') %></a>
+  </article><% }) %>
+</div>

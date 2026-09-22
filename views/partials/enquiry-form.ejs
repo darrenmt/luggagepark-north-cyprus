@@ -1,0 +1,23 @@
+<form method="post" action="<%= action %>" id="form" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+  <% if (sent) { %><div class="alert alert-ok" role="status"><%= t('contact.sent') %></div><% } %>
+  <% if (error) { %><div class="alert alert-err" role="alert"><%= error %></div><% } %>
+  <div class="form-grid two">
+    <label class="field"><span><%= t('contact.name') %></span><input name="name" required autocomplete="name" value="<%= form.name || '' %>"></label>
+    <label class="field"><span><%= t('contact.email') %></span><input type="email" name="email" required autocomplete="email" value="<%= form.email || '' %>"></label>
+    <label class="field"><span><%= t('contact.phone') %></span><input type="tel" name="phone" autocomplete="tel" value="<%= form.phone || '' %>"></label>
+    <% if (typeof business !== 'undefined' && business) { %>
+    <label class="field"><span><%= t('contact.company') %></span><input name="company" autocomplete="organization" value="<%= form.company || '' %>"></label>
+    <% } else { %>
+    <label class="field"><span><%= t('contact.type') %></span><select name="type">
+      <% ['general','booking','business','host'].forEach(function(k){ %><option value="<%= k %>"<%= form.type===k?' selected':'' %>><%= t('contact.type.'+k) %></option><% }) %>
+    </select></label><% } %>
+  </div>
+  <% if (typeof business !== 'undefined' && business) { %>
+  <label class="field" style="margin-top:16px"><span><%= t('contact.type') %></span><select name="type">
+    <% ['business','host'].forEach(function(k){ %><option value="<%= k %>"<%= form.type===k?' selected':'' %>><%= t('contact.type.'+k) %></option><% }) %>
+  </select></label><% } %>
+  <label class="field" style="margin-top:16px"><span><%= t('contact.message') %></span><textarea name="message" required><%= form.message || '' %></textarea></label>
+  <button class="btn btn-primary btn-lg" type="submit"><%= t('contact.send') %></button>
+</form>

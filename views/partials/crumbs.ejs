@@ -1,0 +1,1 @@
+<% if (breadcrumbs) { %><nav class="crumbs" aria-label="<%= lang==='tr'?'Konum':'Breadcrumb' %>"><% breadcrumbs.forEach(function(c,i){ %><% if (i) { %><span aria-hidden="true">/</span><% } %><% if (i < breadcrumbs.length-1) { %><a href="<%= c.href %>"><%= c.name %></a><% } else { %><span aria-current="page"><%= c.name %></span><% } %><% }) %></nav><% } %>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title><%= title %></title>
+<meta name="description" content="<%= description %>">
+<% if (typeof noindex !== 'undefined' && noindex) { %><meta name="robots" content="noindex, nofollow"><% } else { %>
+<link rel="canonical" href="<%= canonical %>">
+<link rel="alternate" hreflang="en" href="<%= siteUrl + alt.en %>">
+<link rel="alternate" hreflang="tr" href="<%= siteUrl + alt.tr %>">
+<link rel="alternate" hreflang="x-default" href="<%= siteUrl + alt.en %>"><% } %>
+<meta name="theme-color" content="#061A30">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LuggagePark">
+<meta property="og:title" content="<%= title %>">
+<meta property="og:description" content="<%= description %>">
+<meta property="og:url" content="<%= canonical %>">
+<meta property="og:image" content="<%= siteUrl %>/img/og.png">
+<meta property="og:locale" content="<%= lang === 'tr' ? 'tr_TR' : 'en_GB' %>">
+<meta property="og:locale:alternate" content="<%= lang === 'tr' ? 'en_GB' : 'tr_TR' %>">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon-180x180.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/site.css?v=<%= assetV %>">
+<% jsonld.forEach(function(j){ %><script type="application/ld+json"><%- JSON.stringify(j).replace(/</g,'\\u003c') %></script>
+<% }) %>
+</head>
+<body>
+<a class="skip" href="#main"><%= t('nav.skip') %></a>
+<% const banner = settings['maintenance_banner_' + lang]; if (banner) { %><div class="banner" role="status"><%= banner %></div><% } %>
+<header class="site-header">
+  <div class="wrap hdr">
+    <a class="logo" href="<%= url('home') %>"><img src="/img/logo.png" alt="LuggagePark" width="150" height="41"></a>
+    <nav class="nav" aria-label="<%= lang === 'tr' ? 'Ana menü' : 'Main' %>">
+      <% [['locations','nav.locations'],['pricing','nav.pricing'],['how','nav.how'],['business','nav.business'],['faq','nav.faq']].forEach(function(n){ %>
+      <a href="<%= url(n[0]) %>"<% if (pageKey === n[0] || (pageKey==='location' && n[0]==='locations')) { %> aria-current="page"<% } %>><%= t(n[1]) %></a><% }) %>
+    </nav>
+    <a class="lang" href="<%= alt[other] %>" hreflang="<%= other %>" lang="<%= other %>" aria-label="<%= t('nav.lang_label') %>"><%= other.toUpperCase() %></a>
+    <a class="btn btn-primary" href="<%= url('book') %>"><%= t('nav.book') %></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="drawer" data-open-label="<%= t('nav.menu') %>" data-close-label="<%= t('nav.close') %>" aria-label="<%= t('nav.menu') %>">
+      <span class="i-open"><%- include('icon', {name:'menu'}) %></span><span class="i-close" hidden><%- include('icon', {name:'close'}) %></span>
+    </button>
+  </div>
+  <div class="drawer" id="drawer" data-open="false">
+    <nav aria-label="<%= lang === 'tr' ? 'Mobil menü' : 'Mobile' %>">
+      <a href="<%= url('locations') %>"><%= t('nav.locations') %></a>
+      <a href="<%= url('pricing') %>"><%= t('nav.pricing') %></a>
+      <a href="<%= url('how') %>"><%= t('nav.how') %></a>
+      <a href="<%= url('business') %>"><%= t('nav.business') %></a>
+      <a href="<%= url('faq') %>"><%= t('nav.faq') %></a>
+      <div class="drawer-sub">
+        <a href="<%= url('track') %>"><%= t('nav.track') %></a>
+        <a href="<%= url('contact') %>"><%= t('nav.contact') %></a>
+        <a href="<%= alt[other] %>" lang="<%= other %>" hreflang="<%= other %>"><%= t('nav.lang_switch') %></a>
+      </div>
+      <a class="btn btn-primary" href="<%= url('book') %>"><%= t('nav.book') %></a>
+    </nav>
+  </div>
+</header>
+<main id="main">
