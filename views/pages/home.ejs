@@ -1,0 +1,122 @@
+<%- include('../partials/top') %>
+<section class="hero on-dark">
+  <div class="wrap hero-grid">
+    <div>
+      <h1><%= t('home.h1') %></h1>
+      <p class="lede"><%= t('home.lede') %></p>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href="<%= url('book') %>"><%= t('home.cta') %></a>
+        <a class="btn btn-line btn-lg" href="<%= url('locations') %>"><%= t('home.cta2') %></a>
+      </div>
+      <ul class="checks">
+        <% ['home.badge1','home.badge2','home.badge3','home.badge4'].forEach(function(k){ %><li><%- include('../partials/icon',{name:'check',size:18}) %><%= t(k) %></li><% }) %>
+      </ul>
+    </div>
+
+    <div class="tag-wrap">
+      <svg class="tag-cord" viewBox="0 0 120 60" aria-hidden="true"><path d="M60 58 C 58 30, 30 20, 8 2 M60 58 C 62 30, 90 20, 112 2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <form class="tag" id="quote" action="<%= url('book') %>" method="get" aria-labelledby="tag-title"
+            data-tiers='<%- JSON.stringify(tiers) %>'
+            data-tariffs='<%- JSON.stringify(tariffs.map(function(x){return {code:x.code,mode:x.mode,price:x.price,min_days:x.min_days,max_days:x.max_days,max_bags:x.max_bags}})) %>'
+            data-sym="<%= settings.currency_symbol %>" data-lang="<%= lang %>"
+            data-save="<%= t('tag.save') %>" data-nudge="<%= t('tag.nudge') %>" data-fee="<%= t('tag.fee') %>"
+            data-l-days="<%= t('tag.days') %>" data-l-months="<%= t('tag.months') %>">
+        <h2 class="tag-title" id="tag-title"><%= t('tag.title') %></h2>
+        <label class="field"><span><%= t('tag.where') %></span>
+          <select name="loc">
+            <% locations.forEach(function(l){ %><option value="<%= l.slug %>"><%= f(l,'name') %></option><% }) %>
+          </select>
+        </label>
+        <label class="field"><span><%= t('tag.plan') %></span>
+          <select name="plan">
+            <% tariffs.forEach(function(x){ %><option value="<%= x.code %>"<%= x.featured ? ' selected' : '' %>><%= f(x,'name') %> · <%= money(x.price) %> <%= f(x,'unit') %></option><% }) %>
+          </select>
+        </label>
+        <div class="tag-row">
+          <div class="field"><span id="bags-l"><%= t('tag.bags') %></span>
+            <div class="stepper" role="group" aria-labelledby="bags-l">
+              <button type="button" data-step="bags" data-d="-1" aria-label="<%= t('tag.less') %>">−</button>
+              <input name="bags" value="2" inputmode="numeric" aria-labelledby="bags-l" readonly>
+              <button type="button" data-step="bags" data-d="1" aria-label="<%= t('tag.more') %>">+</button>
+            </div>
+          </div>
+          <div class="field" data-days-field><span id="days-l"><%= t('tag.days') %></span>
+            <div class="stepper" role="group" aria-labelledby="days-l">
+              <button type="button" data-step="days" data-d="-1" aria-label="<%= t('tag.lessd') %>">−</button>
+              <input name="days" value="1" inputmode="numeric" aria-labelledby="days-l" readonly>
+              <button type="button" data-step="days" data-d="1" aria-label="<%= t('tag.mored') %>">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="tag-total"><span><%= t('tag.total') %></span><output class="amt" id="q-total" aria-live="polite">—</output></div>
+        <p class="tag-note" id="q-note" aria-live="polite"><%= t('tag.fee') %></p>
+        <button class="btn btn-primary btn-block btn-lg" type="submit"><%= t('tag.continue') %></button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="head"><h2><%= t('home.where.h2') %></h2><p class="lede"><%= t('home.where.lede') %></p></div>
+    <div class="board">
+      <% locations.forEach(function(l){ %>
+      <a class="board-row" href="<%= url('locations', l.slug) %>">
+        <span class="board-town"><%= t('loc.town.' + l.town) %></span>
+        <span class="board-name"><%= f(l,'name') %></span>
+        <span class="board-best"><%= f(l,'best_for') %></span>
+        <span class="board-hours"><%= l.open_24h ? '24/7' : l.open_time + '–' + l.close_time %><small><%= t('loc.everyday') %></small></span>
+        <span class="board-arrow"><%- include('../partials/icon',{name:'arrow'}) %></span>
+      </a><% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="head"><h2><%= t('home.how.h2') %></h2></div>
+    <ol class="steps">
+      <% [1,2,3,4].forEach(function(n){ %><li><h3><%= t('step'+n+'.h') %></h3><p><%= t('step'+n+'.p') %></p></li><% }) %>
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="head"><h2><%= t('home.for.h2') %></h2></div>
+    <div class="cases">
+      <% [1,2,3,4,5].forEach(function(n){ %><article class="case"><h3><%= t('for.'+n+'.h') %></h3><p><%= t('for.'+n+'.p') %></p></article><% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section dark">
+  <div class="wrap">
+    <div class="head"><h2><%= t('home.why.h2') %></h2></div>
+    <div class="features three">
+      <% [['person',1],['bag',2],['shield',3],['clock',4],['card',5],['chat',6]].forEach(function(w){ %>
+      <div class="feature"><span class="ic"><%- include('../partials/icon',{name:w[0]}) %></span><h3><%= t('why.'+w[1]+'.h') %></h3><p><%= t('why.'+w[1]+'.p') %></p></div><% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="head"><h2><%= t('home.pricing.h2') %></h2><p class="lede"><%= t('home.pricing.lede') %></p></div>
+    <%- include('../partials/prices', { tariffs: tariffs }) %>
+    <p style="margin-top:24px"><a href="<%= url('pricing') %>"><%= t('home.pricing.all') %></a></p>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap" style="max-width:860px">
+    <div class="head"><h2><%= t('home.faq.h2') %></h2></div>
+    <div class="faq">
+      <% faqs.forEach(function(q){ %><details><summary><%= f(q,'q') %></summary><div><p><%= f(q,'a') %></p></div></details><% }) %>
+    </div>
+    <p style="margin-top:24px"><a href="<%= url('faq') %>"><%= t('home.faq.all') %></a></p>
+  </div>
+</section>
+
+<%- include('../partials/cta') %>
+<%- include('../partials/bottom') %>

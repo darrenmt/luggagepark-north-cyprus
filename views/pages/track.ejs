@@ -1,0 +1,12 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('track.h1'), lede: t('track.lede')}) %>
+<section class="section tight"><div class="wrap" style="max-width:560px">
+  <% if (error) { %><div class="alert alert-err" role="alert"><%= error %></div><% } %>
+  <form method="post" action="<%= url('track') %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field"><span><%= t('track.ref') %></span><input name="ref" required placeholder="LP-XXXXXX" autocapitalize="characters" value="<%= form.ref || '' %>"></label>
+    <label class="field"><span><%= t('track.email') %></span><input type="email" name="email" required autocomplete="email" value="<%= form.email || '' %>"></label>
+    <button class="btn btn-primary btn-lg btn-block" type="submit"><%= t('track.submit') %></button>
+  </form>
+</div></section>
+<%- include('../partials/bottom') %>

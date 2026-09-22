@@ -1,0 +1,12 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('faq.h1'), lede: t('faq.lede')}) %>
+<section class="section tight">
+  <div class="wrap faq" style="max-width:860px">
+    <% Object.keys(groups).forEach(function(cat){ %>
+    <h2><%= t('faq.cat.' + cat) %></h2>
+    <% groups[cat].forEach(function(q){ %><details><summary><%= f(q,'q') %></summary><div><p><%= f(q,'a') %></p></div></details><% }) %>
+    <% }) %>
+  </div>
+</section>
+<%- include('../partials/cta') %>
+<%- include('../partials/bottom') %>

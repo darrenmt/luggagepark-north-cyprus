@@ -1,0 +1,7 @@
+<%- include('../partials/top') %>
+<section class="section"><div class="wrap" style="max-width:720px">
+  <h1><%= code === 404 ? t('misc.404.h1') : t('misc.500.h1') %></h1>
+  <p class="lede"><%= code === 404 ? t('misc.404.p') : t('misc.500.p') %></p>
+  <div class="btn-row"><a class="btn btn-primary" href="<%= url('book') %>"><%= t('nav.book') %></a><a class="btn btn-line" href="<%= url('home') %>"><%= t('misc.back_home') %></a></div>
+</div></section>
+<%- include('../partials/bottom') %>

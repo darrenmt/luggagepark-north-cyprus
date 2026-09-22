@@ -1,0 +1,19 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('about.h1'), lede: ''}) %>
+<section class="section tight">
+  <div class="wrap" style="max-width:820px">
+    <p class="lede"><%= t('about.p1') %></p>
+    <p class="lede"><%= t('about.p2') %></p>
+  </div>
+</section>
+<section class="section alt">
+  <div class="wrap">
+    <div class="head"><h2><%= t('about.values.h2') %></h2></div>
+    <div class="features three">
+      <% [['person',1],['card',2],['access',3]].forEach(function(w){ %>
+      <div class="feature"><span class="ic"><%- include('../partials/icon',{name:w[0]}) %></span><h3><%= t('about.v'+w[1]+'.h') %></h3><p><%= t('about.v'+w[1]+'.p') %></p></div><% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/cta') %>
+<%- include('../partials/bottom') %>

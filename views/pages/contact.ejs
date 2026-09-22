@@ -1,0 +1,14 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('contact.h1'), lede: t('contact.lede')}) %>
+<section class="section tight">
+  <div class="wrap" style="max-width:960px">
+    <div class="channels">
+      <a class="channel" href="https://wa.me/<%= settings.whatsapp %>" rel="noopener"><span class="ic"><%- include('../partials/icon',{name:'chat'}) %></span><span><%= t('contact.whatsapp') %><small><%= settings.phone %></small></span></a>
+      <a class="channel" href="tel:<%= settings.phone.replace(/\s/g,'') %>"><span class="ic"><%- include('../partials/icon',{name:'phone'}) %></span><span><%= t('contact.call') %><small><%= settings.phone %></small></span></a>
+      <a class="channel" href="mailto:<%= settings.email %>"><span class="ic"><%- include('../partials/icon',{name:'mail'}) %></span><span><%= t('contact.emailus') %><small><%= settings.email %></small></span></a>
+    </div>
+    <h2><%= t('contact.form.h2') %></h2>
+    <%- include('../partials/enquiry-form', { action: url('contact') }) %>
+  </div>
+</section>
+<%- include('../partials/bottom') %>

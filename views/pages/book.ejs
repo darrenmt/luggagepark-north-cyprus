@@ -1,0 +1,94 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('book.h1'), lede: t('book.lede')}) %>
+<section class="section tight">
+  <div class="wrap">
+    <% var E = errors || {}; var has = Object.keys(E).length; %>
+    <% if (has) { %><div class="alert alert-err" role="alert"><%= t('book.err.generic') %><% Object.keys(E).forEach(function(k){ if (E[k] !== t('book.err.generic')) { %><br><%= E[k] %><% } }) %></div><% } %>
+    <form class="book-layout" id="bookform" method="post" action="<%= url('book') %>" novalidate
+      data-tariffs='<%- JSON.stringify(tariffs.map(function(x){return {id:x.id,mode:x.mode,price:x.price,hours:x.hours,min_days:x.min_days,max_days:x.max_days,max_bags:x.max_bags,name:f(x,"name").replace(/\x27/g,"’")}})) %>'
+      data-addons='<%- JSON.stringify(addons.map(function(a){return {id:a.id,price:a.price,per:a.per}})) %>'
+      data-tiers='<%- JSON.stringify(tiers) %>' data-sym="<%= settings.currency_symbol %>" data-lang="<%= lang %>"
+      data-l-days="<%= t('book.days') %>" data-l-months="<%= t('book.months') %>">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div>
+        <fieldset class="book-step">
+          <legend><b>1</b><%= t('book.s1') %></legend>
+          <label class="field<%= E.location_id ? ' has-err' : '' %>"><span><%= t('book.location') %></span>
+            <select name="location_id" required>
+              <% locations.forEach(function(l){ %><option value="<%= l.id %>" data-open="<%= l.open_24h ? '00:00' : l.open_time %>" data-close="<%= l.open_24h ? '23:59' : l.close_time %>"<%= +form.location_id === l.id ? ' selected' : '' %>><%= f(l,'name') %> (<%= hours(l) %>)</option><% }) %>
+            </select>
+            <% if (E.location_id && E.location_id !== t('book.err.generic')) { %><span class="err"><%= E.location_id %></span><% } %>
+          </label>
+          <div class="form-grid two">
+            <label class="field<%= E.date ? ' has-err' : '' %>"><span><%= t('book.date') %></span><input type="date" name="date" required min="<%= minDate %>" value="<%= form.date || '' %>"></label>
+            <label class="field<%= E.time ? ' has-err' : '' %>"><span><%= t('book.time') %></span><input type="time" name="time" required step="900" value="<%= form.time || '' %>"></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="book-step">
+          <legend><b>2</b><%= t('book.s2') %></legend>
+          <div class="choice-list cols" role="radiogroup" aria-label="<%= t('book.plan') %>" style="margin-bottom:18px">
+            <% tariffs.forEach(function(x){ %>
+            <label class="choice"><input type="radio" name="tariff_id" value="<%= x.id %>"<%= +form.tariff_id === x.id ? ' checked' : '' %>>
+              <span class="box"><b><%= f(x,'name') %></b><span class="p"><%= money(x.price) %></span><small><%= f(x,'unit') %></small></span></label><% }) %>
+          </div>
+          <div class="form-grid two">
+            <div class="field"><span id="b-bags"><%= t('book.bags') %></span>
+              <div class="stepper" role="group" aria-labelledby="b-bags">
+                <button type="button" data-step="bags" data-d="-1" aria-label="<%= t('tag.less') %>">−</button>
+                <input name="bags" type="number" min="1" max="20" value="<%= form.bags || 1 %>" aria-labelledby="b-bags">
+                <button type="button" data-step="bags" data-d="1" aria-label="<%= t('tag.more') %>">+</button>
+              </div>
+            </div>
+            <div class="field" data-days-field><span id="b-days"><%= t('book.days') %></span>
+              <div class="stepper" role="group" aria-labelledby="b-days">
+                <button type="button" data-step="days" data-d="-1" aria-label="<%= t('tag.lessd') %>">−</button>
+                <input name="days" type="number" min="1" max="360" value="<%= form.days || 2 %>" aria-labelledby="b-days">
+                <button type="button" data-step="days" data-d="1" aria-label="<%= t('tag.mored') %>">+</button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <% if (addons.length) { %>
+        <fieldset class="book-step">
+          <legend><b>3</b><%= t('book.s3') %></legend>
+          <div class="choice-list cols">
+            <% var picked = [].concat(form.addons || []).map(String); addons.forEach(function(a){ %>
+            <label class="choice"><input type="checkbox" name="addons" value="<%= a.id %>"<%= picked.indexOf(String(a.id)) > -1 ? ' checked' : '' %>>
+              <span class="box"><b><%= f(a,'name') %></b><span class="p"><%= money(a.price) %></span><small><%= f(a,'desc') %> · <%= t(a.per==='bag' ? 'pricing.per_bag' : 'pricing.per_booking') %></small></span></label><% }) %>
+          </div>
+        </fieldset><% } %>
+
+        <fieldset class="book-step">
+          <legend><b><%= addons.length ? 4 : 3 %></b><%= t('book.s4') %></legend>
+          <div class="form-grid two">
+            <label class="field<%= E.customer_name ? ' has-err' : '' %>"><span><%= t('book.name') %></span><input name="customer_name" required autocomplete="name" value="<%= form.customer_name || '' %>">
+              <% if (E.customer_name) { %><span class="err"><%= E.customer_name %></span><% } %></label>
+            <label class="field<%= E.email ? ' has-err' : '' %>"><span><%= t('book.email') %></span><input type="email" name="email" required autocomplete="email" inputmode="email" value="<%= form.email || '' %>">
+              <% if (E.email) { %><span class="err"><%= E.email %></span><% } %></label>
+          </div>
+          <label class="field" style="margin-top:16px"><span><%= t('book.phone') %> <span class="hint"><%= t('book.phone_hint') %></span></span><input type="tel" name="phone" autocomplete="tel" value="<%= form.phone || '' %>"></label>
+          <label class="field"><span><%= t('book.notes') %> <span class="hint"><%= t('book.notes_hint') %></span></span><textarea name="notes" rows="3" style="min-height:90px"><%= form.notes || '' %></textarea></label>
+          <label class="check<%= E.terms ? ' has-err' : '' %>"><input type="checkbox" name="terms" value="1" required<%= form.terms ? ' checked' : '' %>>
+            <span><%- t('book.terms', {terms: '<a href="' + url('terms') + '" target="_blank">' + t('book.terms_link') + '</a>'}) %></span></label>
+          <% if (E.terms) { %><p class="err"><%= E.terms %></p><% } %>
+        </fieldset>
+      </div>
+
+      <aside class="summary" aria-labelledby="sum-h">
+        <h2 id="sum-h"><%= t('book.summary') %></h2>
+        <div class="sum-row"><span id="s-plan">—</span><span id="s-sub">—</span></div>
+        <div class="sum-row disc" id="s-disc-row" hidden><span><%= t('book.discount') %> <span id="s-pct"></span></span><span id="s-disc"></span></div>
+        <div class="sum-row" id="s-add-row" hidden><span><%= t('book.extras') %></span><span id="s-add"></span></div>
+        <div class="sum-row"><span><%= t('book.collect_by') %></span><span id="s-pick">—</span></div>
+        <div class="sum-row total"><span><%= t('book.total') %></span><span id="s-total" aria-live="polite">—</span></div>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" style="margin-top:18px"><%= t('book.submit') %></button>
+        <p class="small muted" style="margin:12px 0 0"><%= t('tag.fee') %></p>
+      </aside>
+    </form>
+  </div>
+</section>
+<script src="/js/pricing.js?v=<%= assetV %>" defer></script>
+<%- include('../partials/bottom') %>

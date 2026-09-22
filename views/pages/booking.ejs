@@ -1,0 +1,35 @@
+<%- include('../partials/top') %>
+<section class="section tight">
+  <div class="wrap">
+    <% if (b.status === 'cancelled') { %><div class="alert alert-err" role="status"><%= t('conf.cancelled') %></div><% } %>
+    <% if (isNew) { %><h1 style="font-size:var(--s5)"><%= t('conf.h1') %></h1><p class="lede"><%= t('conf.lede', {email: b.email}) %></p><% } else { %><h1 style="font-size:var(--s5)"><%= t('track.h1') %></h1><% } %>
+    <div class="ticket">
+      <div class="ticket-top">
+        <div><div class="small" style="color:#AFC0D0"><%= t('conf.ref') %></div><div class="ticket-ref"><%= b.ref %></div></div>
+        <span class="status <%= b.status %>"><%= t('status.' + b.status) %></span>
+      </div>
+      <div class="ticket-body">
+        <dl class="facts" style="margin:0">
+          <div><dt><%= t('conf.where') %></dt><dd><a href="<%= url('locations', b.loc_slug) %>"><%= b['loc_name_' + lang] %></a><br><span class="small muted"><%= b['loc_address_' + lang] %></span></dd></div>
+          <div><dt><%= t('conf.drop') %></dt><dd><%= fmtDate(b.dropoff_at) %></dd></div>
+          <div><dt><%= t('conf.collect') %></dt><dd><%= fmtDate(b.pickup_at) %></dd></div>
+          <div><dt><%= t('conf.bags') %></dt><dd><%= b.bags %> · <%= b['tariff_name_' + lang] %><% if (b.addons.length) { %><br><span class="small muted"><%= b.addons.map(function(a){return a.name}).join(', ') %></span><% } %></dd></div>
+          <div><dt><%= t('conf.pay') %></dt><dd><strong style="font-size:1.3rem;color:var(--ink)"><%= money(b.total) %></strong><% if (b.discount > 0) { %> <span class="small muted">(−<%= money(b.discount) %>)</span><% } %></dd></div>
+        </dl>
+        <% if (b.status !== 'cancelled') { %><div class="ticket-qr"><%- qr %><%= t('conf.qr') %></div><% } %>
+      </div>
+    </div>
+    <div class="btn-row no-print" style="margin-top:24px">
+      <button class="btn btn-line" type="button" data-print><%= t('conf.print') %></button>
+      <a class="btn btn-line" href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(b.ref) %>" rel="noopener"><%= t('conf.add_whatsapp') %></a>
+      <% if (b.lat) { %><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=<%= b.lat %>,<%= b.lng %>" rel="noopener"><%= t('loc.directions') %></a><% } %>
+    </div>
+    <% if (canCancel) { %>
+    <form method="post" action="<%= url('booking', b.ref) %>/cancel" class="no-print" style="margin-top:28px" data-confirm="<%= t('conf.cancel_confirm') %>">
+      <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="k" value="<%= b.token %>">
+      <button class="btn" type="submit" style="color:#8C1D18;padding:0;min-height:0;background:none;text-decoration:underline"><%= t('conf.cancel') %></button>
+    </form>
+    <% } else if (['pending','confirmed'].includes(b.status)) { %><p class="small muted" style="margin-top:24px"><%= t('conf.cancel_late') %></p><% } %>
+  </div>
+</section>
+<%- include('../partials/bottom') %>

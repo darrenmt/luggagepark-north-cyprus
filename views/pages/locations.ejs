@@ -1,0 +1,20 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('loc.h1'), lede: t('loc.lede')}) %>
+<section class="section tight">
+  <div class="wrap">
+    <% Object.keys(towns).forEach(function(town){ %>
+    <h2 style="font-size:var(--s4);margin-top:40px"><%= t('loc.town.' + town) %></h2>
+    <div class="board">
+      <% towns[town].forEach(function(l){ %>
+      <a class="board-row" href="<%= url('locations', l.slug) %>">
+        <span class="board-town"><% if (l.step_free) { %><%= t('loc.stepfree') %><% } %></span>
+        <span class="board-name"><%= f(l,'name') %></span>
+        <span class="board-best"><%= f(l,'address') %></span>
+        <span class="board-hours"><%= l.open_24h ? '24/7' : l.open_time + '–' + l.close_time %><small><%= f(l,'best_for') %></small></span>
+        <span class="board-arrow"><%- include('../partials/icon',{name:'arrow'}) %></span>
+      </a><% }) %>
+    </div><% }) %>
+  </div>
+</section>
+<%- include('../partials/cta') %>
+<%- include('../partials/bottom') %>

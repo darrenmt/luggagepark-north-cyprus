@@ -1,0 +1,31 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('pricing.h1'), lede: t('pricing.lede')}) %>
+<section class="section tight">
+  <div class="wrap"><%- include('../partials/prices', { tariffs: tariffs }) %></div>
+</section>
+<section class="section alt">
+  <div class="wrap">
+    <div class="head"><h2><%= t('pricing.disc.h2') %></h2><p><%= t('pricing.disc.p') %></p></div>
+    <div class="table-scroll" style="max-width:640px">
+      <table>
+        <thead><tr><th scope="col"><%= t('pricing.disc.col1') %></th><th scope="col"><%= t('pricing.disc.col2') %></th></tr></thead>
+        <tbody>
+          <tr><td>1–<%= tiers.length ? tiers[0].min_bag_days - 1 : '∞' %></td><td><%= t('pricing.disc.std') %></td></tr>
+          <% tiers.forEach(function(tr, i){ var next = tiers[i+1]; %>
+          <tr><td><%= tr.min_bag_days %><%= next ? '–' + (next.min_bag_days - 1) : '+' %></td><td><strong><%= lang==='tr' ? '%' + tr.percent : tr.percent + '%' %></strong></td></tr><% }) %>
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:16px"><%= t('pricing.trade') %> <a href="<%= url('business') %>"><%= t('pricing.trade.link') %></a></p>
+  </div>
+</section>
+<section class="section" id="extras">
+  <div class="wrap">
+    <div class="head"><h2><%= t('pricing.addons.h2') %></h2><p><%= t('pricing.addons.p') %></p></div>
+    <div class="addon-list">
+      <% addons.forEach(function(a){ %><div class="addon"><b><%= f(a,'name') %></b><span class="p"><%= money(a.price) %></span><span><%= f(a,'desc') %> · <%= t(a.per==='bag' ? 'pricing.per_bag' : 'pricing.per_booking') %></span></div><% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/cta') %>
+<%- include('../partials/bottom') %>

@@ -1,0 +1,5 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t(which + '.h1'), lede: ''}) %>
+<section class="section tight"><div class="wrap" style="max-width:780px"><p><%= t(which + '.body') %></p>
+<p class="muted small"><%= settings.business_name %> · <a href="mailto:<%= settings.email %>"><%= settings.email %></a></p></div></section>
+<%- include('../partials/bottom') %>

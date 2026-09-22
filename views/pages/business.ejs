@@ -1,0 +1,23 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('biz.h1'), lede: t('biz.lede')}) %>
+<section class="section tight">
+  <div class="wrap">
+    <div class="features">
+      <% [['hotel',1],['ship',2],['ring',3],['grad',4]].forEach(function(w){ %>
+      <div class="feature"><span class="ic"><%- include('../partials/icon',{name:w[0]}) %></span><h2 style="font-size:1.2rem;margin:6px 0 4px"><%= t('biz.'+w[1]+'.h') %></h2><p><%= t('biz.'+w[1]+'.p') %></p></div><% }) %>
+    </div>
+  </div>
+</section>
+<section class="section dark">
+  <div class="wrap" style="max-width:820px">
+    <h2><%= t('biz.host.h2') %></h2>
+    <p class="lede" style="color:#C9D5E1"><%= t('biz.host.p') %></p>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap" style="max-width:760px">
+    <h2><%= t('biz.form.h2') %></h2>
+    <%- include('../partials/enquiry-form', { action: url('business'), business: true }) %>
+  </div>
+</section>
+<%- include('../partials/bottom') %>

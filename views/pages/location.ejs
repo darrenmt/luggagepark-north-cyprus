@@ -1,0 +1,47 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('meta.location.title', {name: f(loc,'name')}).split(' | ')[0], lede: f(loc,'desc')}) %>
+<section class="section tight">
+  <div class="wrap loc-grid">
+    <div>
+      <div class="btn-row" style="margin-bottom:8px">
+        <span class="pill"><%- include('../partials/icon',{name:'clock',size:16}) %><%= hours(loc) %></span>
+        <% if (loc.step_free) { %><span class="pill"><%- include('../partials/icon',{name:'access',size:16}) %><%= t('loc.stepfree') %></span><% } %>
+      </div>
+      <dl class="facts">
+        <div><dt><%= t('loc.address') %></dt><dd><%= f(loc,'address') %>, <%= t('loc.town.' + loc.town) %></dd></div>
+        <div><dt><%= t('loc.hours') %></dt><dd><%= t('loc.everyday') %>, <%= hours(loc) %></dd></div>
+        <div><dt><%= t('loc.best') %></dt><dd><%= f(loc,'best_for') %></dd></div>
+        <div><dt><%= t('loc.from') %></dt><dd><strong><%= money(fromPrice) %></strong> <%= t('mobilebar.per_bag') %></dd></div>
+      </dl>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href="<%= url('book') %>?loc=<%= loc.slug %>"><%= t('loc.book_here') %></a>
+        <% if (loc.lat) { %><a class="btn btn-line btn-lg" href="https://www.google.com/maps/dir/?api=1&destination=<%= loc.lat %>,<%= loc.lng %>" rel="noopener"><%= t('loc.directions') %></a><% } %>
+      </div>
+    </div>
+    <% if (loc.lat) { var d = 0.006; %>
+    <iframe class="map" loading="lazy" title="<%= t('loc.map', {name: f(loc,'name')}) %>"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=<%= (loc.lng-d).toFixed(4) %>%2C<%= (loc.lat-d*0.8).toFixed(4) %>%2C<%= (loc.lng+d).toFixed(4) %>%2C<%= (loc.lat+d*0.8).toFixed(4) %>&layer=mapnik&marker=<%= loc.lat %>%2C<%= loc.lng %>"></iframe><% } %>
+  </div>
+</section>
+<section class="section alt">
+  <div class="wrap">
+    <div class="head"><h2><%= t('home.pricing.h2') %></h2></div>
+    <%- include('../partials/prices', { tariffs: tariffs }) %>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap">
+    <h2><%= t('loc.other') %></h2>
+    <div class="board">
+      <% others.forEach(function(l){ %>
+      <a class="board-row" href="<%= url('locations', l.slug) %>">
+        <span class="board-town"><%= t('loc.town.' + l.town) %></span>
+        <span class="board-name"><%= f(l,'name') %></span>
+        <span class="board-best"><%= f(l,'best_for') %></span>
+        <span class="board-hours"><%= l.open_24h ? '24/7' : l.open_time + '–' + l.close_time %></span>
+        <span class="board-arrow"><%- include('../partials/icon',{name:'arrow'}) %></span>
+      </a><% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/bottom') %>

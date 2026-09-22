@@ -1,0 +1,23 @@
+<%- include('../partials/top') %>
+<%- include('../partials/pagehero', {h1: t('how.h1'), lede: t('how.lede')}) %>
+<section class="section">
+  <div class="wrap">
+    <ol class="steps">
+      <% [1,2,3,4].forEach(function(n){ %><li><h2 style="font-size:var(--s3)"><%= t('step'+n+'.h') %></h2><p><%= t('step'+n+'.p') %></p></li><% }) %>
+    </ol>
+  </div>
+</section>
+<section class="section alt">
+  <div class="wrap">
+    <div class="head"><h2><%= t('how.behind.h2') %></h2></div>
+    <div class="features">
+      <% [['bag',1],['camera',2],['shield',3],['check',4]].forEach(function(w){ %>
+      <div class="feature"><span class="ic"><%- include('../partials/icon',{name:w[0]}) %></span><p style="margin-top:8px"><%= t('how.behind.'+w[1]) %></p></div><% }) %>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap"><h2><%= t('how.bring.h2') %></h2><p class="lede"><%= t('how.bring.p') %></p></div>
+</section>
+<%- include('../partials/cta') %>
+<%- include('../partials/bottom') %>
