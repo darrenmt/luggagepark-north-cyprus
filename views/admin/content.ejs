@@ -1,0 +1,17 @@
+<%- include('_top') %>
+<div class="page-head"><h1>Site text</h1><p class="muted">Edit any wording on the public site in both languages. Changes go live immediately. Use <b>Reset</b> to go back to the original.</p></div>
+<form class="filters" method="get"><input name="q" value="<%= q %>" placeholder="Search any text, e.g. 'Ercan'" aria-label="Search text"><button class="btn">Search</button></form>
+<nav class="seg wrap-seg" aria-label="Sections"><% groups.forEach(function(gr){ %><a href="/admin/content?g=<%= gr %>"<%= g===gr ? ' aria-current=page' : '' %>><%= gr %></a><% }) %></nav>
+<% keys.forEach(function(k){ var o = ov[k] || {}; var long = dict.en[k].length > 80; %>
+<form method="post" action="/admin/content" class="panel stack ct" id="k-<%= k.replace(/\./g,'-') %>">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= k %>">
+  <div class="ct-head"><code><%= k %></code><% if (o.en || o.tr) { %><span class="tagpill">Edited</span><% } %></div>
+  <div class="fg2">
+    <label class="f"><span>English</span><% if (long) { %><textarea name="en" rows="3"><%= o.en || dict.en[k] %></textarea><% } else { %><input name="en" value="<%= o.en || dict.en[k] %>"><% } %></label>
+    <label class="f"><span>Turkish</span><% if (long) { %><textarea name="tr" rows="3" lang="tr"><%= o.tr || dict.tr[k] || '' %></textarea><% } else { %><input name="tr" lang="tr" value="<%= o.tr || dict.tr[k] || '' %>"><% } %></label>
+  </div>
+  <div class="row-actions"><button class="btn btn-sm">Save</button><% if (o.en || o.tr) { %><button class="linkbtn" name="reset" value="1">Reset to original</button><% } %></div>
+</form><% }) %>
+<% if (!keys.length) { %><div class="panel"><p>No text matches “<%= q %>”.</p></div><% } %>
+<p class="small muted">Placeholders like {name} or {pct} are filled in automatically. Keep them in both languages.</p>
+<%- include('_bottom') %>

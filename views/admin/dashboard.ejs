@@ -1,0 +1,52 @@
+<%- include('_top') %>
+<div class="page-head"><h1>Today</h1><p class="muted"><%= fmt(today + ' 12:00').replace(/,? \d{2}:\d{2}$/, '') %><% if (me.role==='staff' && me.location_id && occupancy[0]) { %> · <%= occupancy[0].name_en %><% } %></p></div>
+
+<div class="kpis">
+  <a class="kpi" href="/admin/bookings?from=<%= today %>&to=<%= today %>&active=1&sort=drop&dir=asc"><span>Arriving today</span><b><%= kpi.arrivals.n %></b><small><%= kpi.arrivals.bags %> bags</small></a>
+  <a class="kpi" href="/admin/bookings?status=checked_in"><span>In storage now</span><b><%= kpi.stored.bags %></b><small>bags across <%= kpi.stored.n %> bookings</small></a>
+  <a class="kpi<%= kpi.overdue.n ? ' warn' : '' %>" href="/admin/bookings?status=checked_in&sort=pickup&dir=asc"><span>Due out today</span><b><%= kpi.dueToday.n %></b><small><%= kpi.overdue.n %> overdue</small></a>
+  <% if (can('manager')) { %>
+  <div class="kpi"><span>Paid this month</span><b><%= money(kpi.revenue.v) %></b><small><%= kpi.monthBookings.n %> bookings made · <%= money(kpi.unpaid.v) %> unpaid</small></div><% } %>
+</div>
+
+<% if (overdueList.length) { %>
+<section class="panel warn-panel">
+  <h2>Past collection time</h2>
+  <ul class="rows">
+    <% overdueList.forEach(function(b){ %><li><a href="/admin/bookings/<%= b.id %>"><b><%= b.ref %></b> <%= b.customer_name %> · <%= b.bags %> bags · <%= b.loc %></a><span class="muted">due <%= fmt(b.pickup_at) %></span><% if (b.phone) { %><a class="mini" href="https://wa.me/<%= b.phone.replace(/\D/g,'') %>" rel="noopener">WhatsApp</a><% } %></li><% }) %>
+  </ul>
+</section><% } %>
+
+<div class="grid2">
+  <section class="panel">
+    <h2>Next drop-offs</h2>
+    <% if (!upcoming.length) { %><p class="muted">Nothing booked yet. Walk-ins go through <a href="/admin/bookings/new">New booking</a>.</p><% } else { %>
+    <ul class="rows">
+      <% upcoming.forEach(function(b){ %>
+      <li>
+        <a href="/admin/bookings/<%= b.id %>"><b><%= b.dropoff_at.slice(11) %></b> <%= b.customer_name %> · <%= b.bags %> bag<%= b.bags>1?'s':'' %><br><small class="muted"><%= b.ref %> · <%= b.loc %><%= b.dropoff_at.slice(0,10) !== today ? ' · ' + fmt(b.dropoff_at) : '' %></small></a>
+        <form method="post" action="/admin/bookings/<%= b.id %>/status"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="checked_in"><input type="hidden" name="back" value="dash"><button class="btn btn-sm">Check in</button></form>
+      </li><% }) %>
+    </ul><% } %>
+  </section>
+  <section class="panel">
+    <h2>Space by location</h2>
+    <ul class="rows occ">
+      <% occupancy.forEach(function(o){ var pct = Math.min(100, Math.round(o.stored / Math.max(1,o.capacity) * 100)); %>
+      <li><div><b><%= o.name_en %></b><small class="muted"><%= o.stored %> / <%= o.capacity %> bags · <%= o.arriving %> arriving</small></div>
+        <div class="bar" role="img" aria-label="<%= pct %>% full"><i style="width:<%= pct %>%" class="<%= pct>85?'hot':'' %>"></i></div></li><% }) %>
+    </ul>
+  </section>
+</div>
+
+<section class="panel">
+  <h2>Drop-offs, last 7 days and next 7</h2>
+  <% var max = Math.max(1, ...series.map(function(s){return s.bags})); %>
+  <div class="chart" role="img" aria-label="Bags per day">
+    <% series.forEach(function(s){ var h = Math.round(s.bags / max * 100); %>
+    <a class="col<%= s.today ? ' today' : '' %><%= s.d > today ? ' future' : '' %>" href="/admin/bookings?from=<%= s.d %>&to=<%= s.d %>" title="<%= s.d %>: <%= s.n %> bookings, <%= s.bags %> bags, <%= money(s.v) %>">
+      <span class="v"><%= s.bags || '' %></span><span class="b" style="height:<%= Math.max(h,2) %>%"></span><span class="d"><%= s.d.slice(8) %></span></a><% }) %>
+  </div>
+  <p class="muted small">Bags per drop-off day. Dark bars are past days, orange is today, grey is booked ahead. Tap a day to see its bookings.</p>
+</section>
+<%- include('_bottom') %>

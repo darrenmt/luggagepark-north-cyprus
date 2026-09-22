@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title><%= title %> · LuggagePark Admin</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/admin.css?v=<%= assetV %>">
+</head>
+<body>
+<% const nav = [
+  ['/admin','Today','home',null], ['/admin/bookings','Bookings','list',null], ['/admin/bookings/new','New booking','plus',null],
+  ['/admin/enquiries','Enquiries','inbox',null],
+  ['/admin/manage/locations','Locations','pin','manager'], ['/admin/manage/tariffs','Prices & plans','tag','manager'], ['/admin/manage/addons','Extras','star','manager'],
+  ['/admin/discounts','Group discounts','percent','manager'], ['/admin/manage/faqs','FAQs','help','manager'], ['/admin/content','Site text','text','manager'],
+  ['/admin/users','Team','users','owner'], ['/admin/settings','Settings','cog','owner'], ['/admin/audit','Activity log','clock','manager'] ];
+  const isOn = h => h === '/admin' ? path === '/' : ('/admin' + path).startsWith(h) && !(h === '/admin/bookings' && path === '/bookings/new');
+%>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side" id="side" data-open="false">
+    <div class="side-head"><a href="/admin" class="brand"><img src="/img/logo.png" alt="LuggagePark" width="130" height="36"></a><span class="env">Admin</span></div>
+    <nav aria-label="Admin">
+      <% nav.forEach(function(n){ if (n[3] && !can(n[3])) return; %>
+      <a href="<%= n[0] %>"<%= isOn(n[0]) ? ' aria-current=page' : '' %>><%- icon(n[2]) %><span><%= n[1] %></span><% if (n[0]==='/admin/enquiries' && newEnquiries) { %><b class="count"><%= newEnquiries %></b><% } %></a><% }) %>
+    </nav>
+    <div class="side-foot">
+      <a href="/admin/account"><%= me.name %><small><%= me.role %></small></a>
+      <a href="/en/" target="_blank" rel="noopener">View site</a>
+      <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button type="submit" class="linkbtn">Sign out</button></form>
+    </div>
+  </aside>
+  <div class="main-col">
+    <header class="topbar">
+      <form class="lookup" action="/admin/lookup" role="search">
+        <%- icon('search') %><label class="sr" for="lk">Find booking</label>
+        <input id="lk" name="q" placeholder="Reference, name, phone or tag" autocomplete="off" autocapitalize="characters">
+      </form>
+      <a class="btn btn-primary hide-m" href="/admin/bookings/new"><%- icon('plus') %>New booking</a>
+    </header>
+    <main id="main" class="content">
+      <% if (flash) { %><div class="flash <%= flash.type %>" role="status"><%= flash.msg %></div><% } %>

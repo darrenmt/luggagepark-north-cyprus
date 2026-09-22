@@ -1,0 +1,28 @@
+<%- include('_top') %>
+<div class="page-head"><p class="muted small" style="margin:0"><a href="/admin/manage/<%= ent %>"><%= E.title %></a></p><h1><%= title %></h1></div>
+<% if (error) { %><div class="flash err" role="alert"><%= error %></div><% } %>
+<form method="post" action="/admin/manage/<%= ent %>/<%= row.id || 'new' %>" class="panel stack">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div class="fg2">
+  <% E.fields.forEach(function(f){ var v = row[f.n]; %>
+    <% if (f.t === 'check') { %>
+    <label class="chk f-check"><input type="checkbox" name="<%= f.n %>" value="1"<%= v ? ' checked' : '' %>> <%= f.l %></label>
+    <% } else { %>
+    <label class="f<%= f.t==='textarea' ? ' span2' : '' %>"><span><%= f.l %><%= f.req ? ' *' : '' %></span>
+      <% if (f.t === 'textarea') { %><textarea name="<%= f.n %>" rows="4"<%= /_tr$/.test(f.n) ? ' lang=tr' : '' %>><%= v == null ? '' : v %></textarea>
+      <% } else if (f.t === 'select') { %><select name="<%= f.n %>"><% f.opts.forEach(function(o){ var ov = Array.isArray(o)?o[0]:o, ol = Array.isArray(o)?o[1]:o; %><option value="<%= ov %>"<%= v===ov?' selected':'' %>><%= ol %></option><% }) %></select>
+      <% } else { %><input type="<%= f.t %>" name="<%= f.n %>" value="<%= v == null ? '' : v %>"<%= f.step ? ' step=' + f.step : '' %><%= f.req ? ' required' : '' %><%= /_tr$/.test(f.n) ? ' lang=tr' : '' %>><% } %>
+      <% if (f.hint) { %><small class="muted"><%= f.hint %></small><% } %>
+    </label>
+    <% } %>
+  <% }) %>
+  </div>
+  <div class="row-actions"><button class="btn btn-primary">Save</button><a class="linkbtn" href="/admin/manage/<%= ent %>">Cancel</a></div>
+</form>
+<% if (row.id) { %>
+<form method="post" action="/admin/manage/<%= ent %>/<%= row.id %>/delete" data-confirm="Delete this <%= E.single %> permanently?" style="margin-top:12px">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><button class="linkbtn danger">Delete this <%= E.single %></button>
+</form>
+<% if (ent==='locations' && row.slug) { %><p class="small muted">Public pages: <a href="/en/locations/<%= row.slug %>" target="_blank">English</a> · <a href="/tr/noktalar/<%= row.slug %>" target="_blank">Turkish</a></p><% } %>
+<% } %>
+<%- include('_bottom') %>

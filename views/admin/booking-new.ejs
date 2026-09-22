@@ -1,0 +1,29 @@
+<%- include('_top') %>
+<div class="page-head"><h1>New booking</h1><p class="muted">For walk-ins, phone bookings and partners. The price is calculated from your current plans and discounts.</p></div>
+<% var E = errors || {}; if (Object.keys(E).length) { %><div class="flash err" role="alert"><% Object.keys(E).forEach(function(k){ %><%= E[k] %><br><% }) %></div><% } %>
+<form method="post" action="/admin/bookings" class="panel stack">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div class="fg2">
+    <% if (!(me.role==='staff' && me.location_id)) { %>
+    <label class="f"><span>Location</span><select name="location_id" required><% locations.forEach(function(l){ %><option value="<%= l.id %>"<%= +form.location_id===l.id?' selected':'' %>><%= l.name_en %></option><% }) %></select></label><% } %>
+    <label class="f"><span>Plan</span><select name="tariff_id" required><% tariffs.forEach(function(x){ %><option value="<%= x.id %>"<%= +form.tariff_id===x.id || (!form.tariff_id && x.featured) ?' selected':'' %>><%= x.name_en %> · <%= money(x.price) %> <%= x.unit_en %></option><% }) %></select></label>
+    <label class="f"><span>Drop-off date</span><input type="date" name="date" value="<%= form.date %>" required></label>
+    <label class="f"><span>Drop-off time</span><input type="time" name="time" value="<%= form.time %>" required></label>
+    <label class="f"><span>Bags</span><input type="number" name="bags" min="1" max="200" value="<%= form.bags %>" required></label>
+    <label class="f"><span>Days (multi-day) or days × 30 (monthly)</span><input type="number" name="days" min="1" value="<%= form.days %>"></label>
+    <label class="f"><span>Customer name</span><input name="customer_name" value="<%= form.customer_name || '' %>" required></label>
+    <label class="f"><span>Email <small class="muted">(optional for walk-ins)</small></span><input type="email" name="email" value="<%= form.email || '' %>"></label>
+    <label class="f"><span>Phone / WhatsApp</span><input type="tel" name="phone" value="<%= form.phone || '' %>"></label>
+    <label class="f"><span>Customer language</span><select name="lang"><option value="en">English</option><option value="tr"<%= form.lang==='tr'?' selected':'' %>>Turkish</option></select></label>
+    <label class="f"><span>Source</span><select name="source"><% [['walkin','Walk-in'],['phone','Phone / WhatsApp'],['partner','Partner / hotel']].forEach(function(s){ %><option value="<%= s[0] %>"<%= form.source===s[0]?' selected':'' %>><%= s[1] %></option><% }) %></select></label>
+    <label class="f"><span>Start as</span><select name="status"><option value="checked_in"<%= form.status==='checked_in'?' selected':'' %>>Bags checked in now</option><option value="confirmed"<%= form.status==='confirmed'?' selected':'' %>>Booked, arriving later</option></select></label>
+    <label class="f"><span>Tag and seal numbers</span><input name="tag_numbers" value="<%= form.tag_numbers || '' %>"></label>
+  </div>
+  <% if (addons.length) { %><fieldset class="f"><legend>Extras</legend><div class="chips"><% var picked=[].concat(form.addons||[]).map(String); addons.forEach(function(a){ %><label class="chk"><input type="checkbox" name="addons" value="<%= a.id %>"<%= picked.indexOf(String(a.id))>-1?' checked':'' %>> <%= a.name_en %> (<%= money(a.price) %><%= a.per==='bag'?'/bag':'' %>)</label><% }) %></div></fieldset><% } %>
+  <label class="f"><span>Internal notes</span><textarea name="notes_internal" rows="2"><%= form.notes_internal || '' %></textarea></label>
+  <div class="payrow"><label class="chk"><input type="checkbox" name="paid" value="1"<%= form.paid?' checked':'' %>> Paid now</label>
+    <select name="payment_method" aria-label="Payment method"><% METHODS.forEach(function(m){ %><option value="<%= m %>"><%= m[0].toUpperCase()+m.slice(1) %></option><% }) %></select>
+    <label class="chk"><input type="checkbox" name="send_email" value="1"<%= form.send_email?' checked':'' %>> Email confirmation to customer</label></div>
+  <button class="btn btn-primary btn-lg">Create booking</button>
+</form>
+<%- include('_bottom') %>

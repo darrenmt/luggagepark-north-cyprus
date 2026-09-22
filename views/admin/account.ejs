@@ -1,0 +1,11 @@
+<%- include('_top') %>
+<div class="page-head"><h1>Your account</h1><p class="muted"><%= me.name %> · <%= me.email %> · <%= me.role %></p></div>
+<% if (error) { %><div class="flash err" role="alert"><%= error %></div><% } %>
+<form method="post" action="/admin/account" class="panel stack" style="max-width:480px">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <label class="f"><span>Current password</span><input type="password" name="current_password" required autocomplete="current-password"></label>
+  <label class="f"><span>New password</span><input type="password" name="new_password" required minlength="10" autocomplete="new-password"><small class="muted">At least 10 characters.</small></label>
+  <label class="f"><span>Repeat new password</span><input type="password" name="confirm_password" required autocomplete="new-password"></label>
+  <button class="btn btn-primary">Change password</button>
+</form>
+<%- include('_bottom') %>

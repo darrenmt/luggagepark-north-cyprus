@@ -1,0 +1,32 @@
+<%- include('_top') %>
+<div class="page-head"><h1>Team</h1><p class="muted"><b>Staff</b> handle bookings and check-ins (limit them to one location if you like). <b>Managers</b> also edit prices, locations, text and export data. <b>Owners</b> also manage the team and settings.</p></div>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><th>Person</th><th>Role</th><th>Location</th><th>Active</th><th>New password</th><th></th></tr></thead>
+  <tbody>
+  <% rows.forEach(function(u){ %>
+  <tr<%= u.active ? '' : ' class=off' %>>
+    <td><b><%= u.name %></b><br><small class="muted"><%= u.email %> · last in <%= u.last_login || 'never' %></small></td>
+    <td><select name="role" form="u<%= u.id %>" aria-label="Role"><% ['staff','manager','owner'].forEach(function(r){ %><option<%= u.role===r?' selected':'' %>><%= r %></option><% }) %></select></td>
+    <td><select name="location_id" form="u<%= u.id %>" aria-label="Location"><option value="">All</option><% locations.forEach(function(l){ %><option value="<%= l.id %>"<%= u.location_id===l.id?' selected':'' %>><%= l.name_en %></option><% }) %></select></td>
+    <td><input type="checkbox" name="active" value="1" form="u<%= u.id %>"<%= u.active?' checked':'' %> aria-label="Active"></td>
+    <td><input type="password" name="password" form="u<%= u.id %>" placeholder="Leave blank" autocomplete="new-password" aria-label="New password"></td>
+    <td><form id="u<%= u.id %>" method="post" action="/admin/users/<%= u.id %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn-sm">Save</button></form></td>
+  </tr><% }) %>
+  </tbody>
+</table></div>
+<section class="panel" style="max-width:720px">
+  <h2>Add a team member</h2>
+  <% if (error) { %><div class="flash err" role="alert"><%= error %></div><% } %>
+  <form method="post" action="/admin/users" class="stack">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="fg2">
+      <label class="f"><span>Name</span><input name="name" required value="<%= form.name || '' %>"></label>
+      <label class="f"><span>Email</span><input type="email" name="email" required value="<%= form.email || '' %>"></label>
+      <label class="f"><span>Role</span><select name="role"><option>staff</option><option>manager</option><option>owner</option></select></label>
+      <label class="f"><span>Location</span><select name="location_id"><option value="">All locations</option><% locations.forEach(function(l){ %><option value="<%= l.id %>"><%= l.name_en %></option><% }) %></select></label>
+      <label class="f"><span>Temporary password</span><input type="text" name="password" required minlength="10" autocomplete="off"><small class="muted">At least 10 characters. Ask them to change it in “Your account”.</small></label>
+    </div>
+    <button class="btn btn-primary">Add team member</button>
+  </form>
+</section>
+<%- include('_bottom') %>

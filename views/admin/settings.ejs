@@ -1,0 +1,19 @@
+<%- include('_top') %>
+<div class="page-head"><h1>Settings</h1></div>
+<form method="post" action="/admin/settings" class="panel stack" style="max-width:720px">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <% SETTINGS.forEach(function(x){ %>
+  <label class="f"><span><%= x[1] %></span><input name="<%= x[0] %>" value="<%= s[x[0]] || '' %>"><% if (x[2]) { %><small class="muted"><%= x[2] %></small><% } %></label><% }) %>
+  <button class="btn btn-primary">Save settings</button>
+</form>
+<section class="panel" style="max-width:720px">
+  <h2>Email sending</h2>
+  <% if (mailOn) { %><p>Email is connected. Booking confirmations and alerts are being sent.</p>
+  <% } else { %><p><b>Not connected.</b> Bookings still work, but confirmation emails are only written to the server log. Add <code>SMTP_HOST</code>, <code>SMTP_USER</code>, <code>SMTP_PASS</code> and <code>MAIL_FROM</code> to the server's environment (see README), then restart.</p><% } %>
+</section>
+<section class="panel" style="max-width:720px">
+  <h2>Backup</h2>
+  <p>Download a complete copy of the database: bookings, customers, prices, text and team. Keep one somewhere safe every week.</p>
+  <a class="btn" href="/admin/backup">Download backup</a>
+</section>
+<%- include('_bottom') %>

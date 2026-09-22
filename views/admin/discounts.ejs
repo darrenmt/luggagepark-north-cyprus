@@ -1,0 +1,12 @@
+<%- include('_top') %>
+<div class="page-head"><h1>Group discounts</h1><p class="muted">Applied automatically to storage (not extras). A bag-day is one bag for one day; Quick Stop and Day Drop count each bag as one bag-day. Monthly lockers aren't discounted.</p></div>
+<form method="post" action="/admin/discounts" class="panel stack" style="max-width:520px">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <table class="tbl plain"><thead><tr><th>From bag-days</th><th>Discount %</th></tr></thead><tbody>
+  <% var rows = tiers.concat([{},{}]); rows.forEach(function(t){ %>
+  <tr><td><input type="number" name="min" min="1" value="<%= t.min_bag_days || '' %>" aria-label="Minimum bag-days"></td><td><input type="number" name="pct" min="0" max="90" step="0.5" value="<%= t.percent || '' %>" aria-label="Discount percent"></td></tr><% }) %>
+  </tbody></table>
+  <p class="small muted">Leave a row empty to remove it. The highest tier a booking reaches applies.</p>
+  <button class="btn btn-primary">Save discounts</button>
+</form>
+<%- include('_bottom') %>

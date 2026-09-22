@@ -1,0 +1,13 @@
+    </main>
+  </div>
+</div>
+<nav class="tabbar" aria-label="Quick">
+  <a href="/admin"<%= path==='/' ? ' aria-current=page' : '' %>><%- icon('home') %>Today</a>
+  <a href="/admin/bookings"<%= path==='/bookings' ? ' aria-current=page' : '' %>><%- icon('list') %>Bookings</a>
+  <a href="/admin/bookings/new" class="tab-new"><%- icon('plus') %>New</a>
+  <a href="/admin/enquiries"<%= path==='/enquiries' ? ' aria-current=page' : '' %>><%- icon('inbox') %>Inbox<% if (newEnquiries) { %><b class="count"><%= newEnquiries %></b><% } %></a>
+  <button type="button" class="tab-menu" aria-controls="side" aria-expanded="false"><%- icon('menu') %>Menu</button>
+</nav>
+<script src="/js/admin.js?v=<%= assetV %>" defer></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<%- include('_top') %>
+<div class="page-head row"><h1><%= E.title %></h1><a class="btn btn-primary" href="/admin/manage/<%= ent %>/new">Add <%= E.single %></a></div>
+<% if (ent==='tariffs') { %><p class="muted">Price changes apply to new bookings immediately. Existing bookings keep the price they were booked at.</p><% } %>
+<div class="table-wrap"><table class="tbl">
+  <thead><tr><% E.heads.forEach(function(h, i){ %><th<%= E.money && i===1 ? ' class=num' : '' %>><%= h %></th><% }) %><th>Status</th><th></th></tr></thead>
+  <tbody>
+  <% rows.forEach(function(r){ var c = E.list(r); %>
+  <tr data-href="/admin/manage/<%= ent %>/<%= r.id %>"<%= r.active ? '' : ' class=off' %>>
+    <% c.forEach(function(v, i){ %><td<%= E.money && i===1 ? ' class=num' : '' %>><%= i===0 ? '' : '' %><% if (i===0) { %><a href="/admin/manage/<%= ent %>/<%= r.id %>"><b><%= v %></b></a><% } else if (E.money && i===1) { %><%= money(v) %><% } else { %><%= v %><% } %></td><% }) %>
+    <td><%= r.active ? 'Active' : 'Hidden' %></td>
+    <td class="num"><a class="linkbtn" href="/admin/manage/<%= ent %>/<%= r.id %>">Edit</a></td>
+  </tr><% }) %>
+  </tbody>
+</table></div>
+<%- include('_bottom') %>

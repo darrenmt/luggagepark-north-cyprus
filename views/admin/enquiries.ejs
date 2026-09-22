@@ -1,0 +1,17 @@
+<%- include('_top') %>
+<div class="page-head row"><h1>Enquiries</h1>
+  <nav class="seg" aria-label="Filter"><% [['','Open'],['new','New'],['replied','Replied'],['archived','Archived']].forEach(function(s){ %><a href="/admin/enquiries<%= s[0] ? '?status='+s[0] : '' %>"<%= (st||'')===s[0] ? ' aria-current=page' : '' %>><%= s[1] %></a><% }) %></nav></div>
+<% if (!rows.length) { %><div class="panel"><p>No enquiries here. Messages from the contact and business forms land in this inbox.</p></div><% } %>
+<% rows.forEach(function(e){ %>
+<article class="panel enq<%= e.status==='new' ? ' is-new' : '' %>">
+  <header><div><b><%= e.name %></b><%= e.company ? ' · ' + e.company : '' %> <span class="tagpill"><%= { general:'Question', booking:'Booking', business:'Business', host:'Host a Point' }[e.type] || e.type %></span> <span class="tagpill"><%= e.lang.toUpperCase() %></span></div>
+    <small class="muted"><%= e.created_at %> UTC</small></header>
+  <p class="msg"><%= e.message %></p>
+  <div class="row-actions">
+    <a class="btn btn-sm" href="mailto:<%= e.email %>?subject=<%= encodeURIComponent('LuggagePark') %>">Reply by email</a>
+    <% if (e.phone) { %><a class="btn btn-sm" href="https://wa.me/<%= e.phone.replace(/\D/g,'') %>" rel="noopener">WhatsApp</a><% } %>
+    <% ['read','replied','archived'].forEach(function(s){ if (s===e.status) return; %>
+    <form method="post" action="/admin/enquiries/<%= e.id %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="<%= s %>"><input type="hidden" name="back" value="<%= st || '' %>"><button class="linkbtn">Mark <%= s %></button></form><% }) %>
+  </div>
+</article><% }) %>
+<%- include('_bottom') %>

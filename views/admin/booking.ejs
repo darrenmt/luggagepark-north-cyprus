@@ -1,0 +1,122 @@
+<%- include('_top') %>
+<% const late = b.status==='checked_in' && b.pickup_at < now; const unpaid = b.payment_status==='unpaid'; %>
+<div class="page-head row">
+  <div><p class="muted small" style="margin:0"><a href="/admin/bookings">Bookings</a></p>
+    <h1 class="ref"><%= b.ref %> <%- include('_status', {s: b.status}) %> <span class="pay pay-<%= b.payment_status %>"><%= b.payment_status %><%= b.payment_method ? ' · ' + b.payment_method : '' %></span></h1></div>
+</div>
+
+<div class="grid2 wide-left">
+  <div>
+    <% if (['pending','confirmed','checked_in'].includes(b.status)) { %>
+    <section class="panel action-panel<%= late ? ' warn-panel' : '' %>">
+      <% if (b.status !== 'checked_in') { %>
+      <h2>Check in <%= b.bags %> bag<%= b.bags>1?'s':'' %></h2>
+      <form method="post" action="/admin/bookings/<%= b.id %>/status" class="stack">
+        <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="checked_in">
+        <label class="f"><span>Tag and seal numbers</span><input name="tag_numbers" value="<%= b.tag_numbers || '' %>" placeholder="e.g. 1042, 1043" inputmode="numeric" autocomplete="off"></label>
+        <% if (unpaid) { %><div class="payrow"><label class="chk"><input type="checkbox" name="mark_paid" value="1"> Paid now</label>
+          <select name="payment_method" aria-label="Payment method"><% METHODS.forEach(function(m){ %><option value="<%= m %>"><%= m[0].toUpperCase()+m.slice(1) %></option><% }) %></select></div><% } %>
+        <button class="btn btn-primary btn-lg btn-block">Check in bags</button>
+      </form>
+      <% } else { %>
+      <h2><%= late ? 'Overdue — collect bags' : 'Hand bags back' %></h2>
+      <p>Tags: <b><%= b.tag_numbers || 'not recorded' %></b>. Check the seals before release.</p>
+      <form method="post" action="/admin/bookings/<%= b.id %>/status" class="stack">
+        <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="collected">
+        <% if (unpaid) { %><p class="due">To pay: <b><%= money(b.total) %></b></p><div class="payrow"><label class="chk"><input type="checkbox" name="mark_paid" value="1" checked> Paid now</label>
+          <select name="payment_method" aria-label="Payment method"><% METHODS.forEach(function(m){ %><option value="<%= m %>"><%= m[0].toUpperCase()+m.slice(1) %></option><% }) %></select></div><% } %>
+        <button class="btn btn-primary btn-lg btn-block">Mark as collected</button>
+      </form>
+      <% } %>
+      <div class="minor-actions">
+        <% if (b.status !== 'checked_in') { %>
+        <form method="post" action="/admin/bookings/<%= b.id %>/status" data-confirm="Mark <%= b.ref %> as a no-show?"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="no_show"><button class="linkbtn">No show</button></form>
+        <form method="post" action="/admin/bookings/<%= b.id %>/status" data-confirm="Cancel <%= b.ref %>?"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="cancelled"><button class="linkbtn danger">Cancel booking</button></form>
+        <% } else if (can('manager')) { %>
+        <form method="post" action="/admin/bookings/<%= b.id %>/status" data-confirm="Undo check-in?"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="confirmed"><button class="linkbtn">Undo check-in</button></form><% } %>
+      </div>
+    </section>
+    <% } else if (can('manager')) { %>
+    <section class="panel"><form method="post" action="/admin/bookings/<%= b.id %>/status" data-confirm="Reopen <%= b.ref %> as confirmed?"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="status" value="confirmed">
+      <p style="margin:0">This booking is <%= STATUS_LABEL[b.status].toLowerCase() %>. <button class="linkbtn">Reopen it</button></p></form></section>
+    <% } %>
+
+    <section class="panel">
+      <h2>Details</h2>
+      <dl class="dl">
+        <div><dt>Customer</dt><dd><b><%= b.customer_name %></b><% if (past) { %> <small class="muted">· <%= past %> earlier booking<%= past>1?'s':'' %></small><% } %><br>
+          <% if (b.email) { %><a href="mailto:<%= b.email %>"><%= b.email %></a><% } %><% if (b.phone) { %><br><a href="tel:<%= b.phone.replace(/\s/g,'') %>"><%= b.phone %></a> · <a href="https://wa.me/<%= b.phone.replace(/\D/g,'') %>" rel="noopener">WhatsApp</a><% } %></dd></div>
+        <div><dt>Location</dt><dd><%= b.loc_name_en %></dd></div>
+        <div><dt>Plan</dt><dd><%= b.tariff_name_en %> · <%= b.bags %> bag<%= b.bags>1?'s':'' %><%= b.tariff_mode !== 'per_bag' ? ' · ' + b.days + ' days' : '' %></dd></div>
+        <div><dt>Drop-off</dt><dd><%= fmt(b.dropoff_at) %><% if (b.checked_in_at) { %><br><small class="muted">Checked in <%= b.checked_in_at %> UTC</small><% } %></dd></div>
+        <div><dt>Collect by</dt><dd<%= late ? ' class=late' : '' %>><%= fmt(b.pickup_at) %><% if (b.collected_at) { %><br><small class="muted">Collected <%= b.collected_at %> UTC</small><% } %></dd></div>
+        <% if (b.addons.length) { %><div><dt>Extras</dt><dd><% b.addons.forEach(function(a){ %><%= a.name %> × <%= a.qty %> (<%= money(a.unit_price * a.qty) %>)<br><% }) %></dd></div><% } %>
+        <div><dt>Price</dt><dd>Storage <%= money(b.subtotal) %><% if (b.discount>0) { %> − discount <%= money(b.discount) %><% } %><% if (b.addons_total>0) { %> + extras <%= money(b.addons_total) %><% } %><br><b class="big"><%= money(b.total) %></b></dd></div>
+        <% if (b.notes_customer) { %><div><dt>Customer note</dt><dd class="note"><%= b.notes_customer %></dd></div><% } %>
+        <div><dt>Source</dt><dd><%= b.source %> · <%= b.lang === 'tr' ? 'Turkish' : 'English' %> · booked <%= b.created_at %> UTC</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Tags and internal notes</h2>
+      <form method="post" action="/admin/bookings/<%= b.id %>/notes" class="stack">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <label class="f"><span>Tag and seal numbers</span><input name="tag_numbers" value="<%= b.tag_numbers || '' %>"></label>
+        <label class="f"><span>Notes (staff only)</span><textarea name="notes_internal" rows="3"><%= b.notes_internal || '' %></textarea></label>
+        <button class="btn">Save notes</button>
+      </form>
+    </section>
+
+    <% if (can('manager')) { %>
+    <details class="panel">
+      <summary><h2 style="display:inline">Edit booking</h2></summary>
+      <form method="post" action="/admin/bookings/<%= b.id %>/edit" class="stack" style="margin-top:14px">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <div class="fg2">
+          <label class="f"><span>Name</span><input name="customer_name" value="<%= b.customer_name %>" required></label>
+          <label class="f"><span>Email</span><input type="email" name="email" value="<%= b.email %>"></label>
+          <label class="f"><span>Phone</span><input name="phone" value="<%= b.phone || '' %>"></label>
+          <label class="f"><span>Location</span><select name="location_id"><% locations.forEach(function(l){ %><option value="<%= l.id %>"<%= l.id===b.location_id?' selected':'' %>><%= l.name_en %></option><% }) %></select></label>
+          <label class="f"><span>Drop-off</span><input type="datetime-local" name="dropoff_at" value="<%= b.dropoff_at.replace(' ','T') %>"></label>
+          <label class="f"><span>Collect by</span><input type="datetime-local" name="pickup_at" value="<%= b.pickup_at.replace(' ','T') %>"></label>
+          <label class="f"><span>Bags</span><input type="number" name="bags" min="1" value="<%= b.bags %>"></label>
+          <label class="f"><span>Total (<%= b.currency %>)</span><input type="number" step="0.01" min="0" name="total" value="<%= b.total %>"></label>
+        </div>
+        <p class="muted small">Changing bags or dates doesn't recalculate the price. Adjust the total yourself if needed.</p>
+        <button class="btn">Save changes</button>
+      </form>
+    </details><% } %>
+  </div>
+
+  <div>
+    <section class="panel">
+      <h2>Payment</h2>
+      <form method="post" action="/admin/bookings/<%= b.id %>/payment" class="stack">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <div class="fg2">
+          <label class="f"><span>Status</span><select name="payment_status"><% PAY.forEach(function(p){ if (p==='refunded' && !can('manager')) return; %><option value="<%= p %>"<%= b.payment_status===p?' selected':'' %>><%= p[0].toUpperCase()+p.slice(1) %></option><% }) %></select></label>
+          <label class="f"><span>Method</span><select name="payment_method"><% METHODS.forEach(function(m){ %><option value="<%= m %>"<%= b.payment_method===m?' selected':'' %>><%= m[0].toUpperCase()+m.slice(1) %></option><% }) %></select></label>
+        </div>
+        <button class="btn">Update payment</button>
+      </form>
+    </section>
+    <section class="panel qrp">
+      <h2>Customer</h2>
+      <div class="qr"><%- qr %></div>
+      <p class="small muted">Scanning this code with a signed-in phone opens this booking.</p>
+      <div class="stack">
+        <a class="btn btn-block" href="<%= customerLink %>" target="_blank" rel="noopener">Open customer page</a>
+        <button class="btn btn-block" type="button" data-copy="<%= customerLink %>">Copy customer link</button>
+        <form method="post" action="/admin/bookings/<%= b.id %>/resend"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn-block">Re-send confirmation email</button></form>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>History</h2>
+      <ol class="history">
+        <% history.forEach(function(h){ var d = {}; try { d = JSON.parse(h.detail || '{}') } catch(e) {} %>
+        <li><b><%= h.action.replace('booking.','').replace('.',' ') %></b><%= d.to ? ' → ' + (STATUS_LABEL[d.to] || d.to) : '' %><%= d.payment_status ? ' → ' + d.payment_status : '' %><br><small class="muted"><%= h.user_name %> · <%= h.created_at %> UTC</small></li><% }) %>
+      </ol>
+    </section>
+  </div>
+</div>
+<%- include('_bottom') %>
